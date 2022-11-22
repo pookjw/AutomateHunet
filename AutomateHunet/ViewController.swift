@@ -34,7 +34,15 @@ final class ViewController: NSViewController {
                     }
                 }
                 
-                try? await Task.sleep(nanoseconds: UInt64(0.1 * 1_000_000_000))
+                await withCheckedContinuation { continuation in
+                    Task { @MainActor in
+                        webView?.evaluateJavaScript("document.querySelector('video').playbackRate = 2.0;") { _, _ in
+                            continuation.resume(returning: ())
+                        }
+                    }
+                }
+                
+                try? await Task.sleep(nanoseconds: 5 * 1_000_000_000)
             }
         }
     }
